@@ -1,0 +1,36 @@
+module blink(
+  input wire clk, // 50MHz input clock
+  output wire [7:0] LED // array of 8 LEDs
+);
+
+  // create a binary counter
+  reg [31:0] cnt; // 32-bit counter
+
+  // create control signals for blinking rate
+  reg slow_blink; // control signal for slow blinking
+  reg fast_blink; // control signal for fast blinking
+
+  initial begin
+    cnt <= 32'h00000000; // start count at zero
+    slow_blink <= 1'b0; // initialize slow_blink control signal
+    fast_blink <= 1'b0; // initialize fast_blink control signal
+  end
+
+  always @(posedge clk) begin
+    // increment counter
+    cnt <= cnt + 1;
+
+    // control blinking rate
+    if (cnt[27:0] == 28'h0) begin
+      slow_blink <= ~slow_blink; // toggle slow_blink every 256 clock cycles
+      fast_blink <= ~fast_blink; // toggle fast_blink every 256 clock cycles
+    end
+  end
+
+  // assign LEDs based on counter value and control signals
+  assign LED[7:6] = slow_blink ? cnt[19:18] : 2'b00; // assign slow blinking LEDs
+  assign LED[5:4] = slow_blink ? cnt[19:18] : 2'b00; // assign slow blinking LEDs
+  assign LED[3:2] = fast_blink ? cnt[19:18] : 2'b00; // assign fast blinking LEDs
+  assign LED[1:0] = fast_blink ? cnt[19:18] : 2'b00; // assign fast blinking LEDs
+
+endmodule
